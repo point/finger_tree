@@ -54,7 +54,7 @@ defmodule FingerTreeTest do
   test "first + rest", %{meter_object: meter_object} do
     ft = FingerTree.finger_tree(meter_object, [1, 2, 3, 4, 5])
 
-    assert %DeepTree{pre: %Digit2{a: 2, b: 3}, mid: %EmptyTree{}, post: %Digit2{a: 4, b: 5}} =
+    assert %DeepTree{pre: %Digit1{a: 2}, mid: %EmptyTree{}, post: %Digit3{a: 3, b: 4, c: 5}} =
              FingerTree.rest(ft)
 
     assert %DeepTree{pre: %Digit1{a: 3}, mid: %EmptyTree{}, post: %Digit2{a: 4, b: 5}} =
@@ -170,7 +170,7 @@ defmodule FingerTreeTest do
     assert FingerTree.measure(ft) == 2048
   end
 
-  test "cons", %{meter_object: meter_object} do
+  test "cons/conj", %{meter_object: meter_object} do
     r = 1..100
 
     assert Enum.to_list(Enum.reverse(r)) ==
@@ -179,6 +179,16 @@ defmodule FingerTreeTest do
                FingerTree.finger_tree(meter_object),
                fn x, ft ->
                  FingerTree.cons(ft, x)
+               end
+             )
+             |> FingerTree.to_list()
+
+    assert Enum.to_list(r) ==
+             r
+             |> Enum.reduce(
+               FingerTree.finger_tree(meter_object),
+               fn x, ft ->
+                 FingerTree.conj(ft, x)
                end
              )
              |> FingerTree.to_list()

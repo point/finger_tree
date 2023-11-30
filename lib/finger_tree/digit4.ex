@@ -58,7 +58,7 @@ defmodule FingerTree.Digit4 do
     def butlast(%Digit4{meter_object: meter_object, a: a, b: b, c: c}),
       do: Digit.new(meter_object, a, b, c)
 
-    def to_reverted_list(%Digit4{a: a, b: b, c: c, d: d}),
+    def to_recursive_reverted_list(%Digit4{a: a, b: b, c: c, d: d}),
       do: [
         maybe_reverted(d) || [d]
         | [maybe_reverted(c) || [c] | [maybe_reverted(b) || [b] | maybe_reverted(a) || [a]]]
@@ -97,5 +97,7 @@ defmodule FingerTree.Digit4 do
         end
       end
     end
+
+    def to_list(%Digit4{a: a, b: b, c: c, d: d}), do: [a, b, c, d]
   end
 end

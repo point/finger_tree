@@ -46,7 +46,7 @@ defmodule FingerTree.Digit2 do
     def last(%Digit2{b: b}), do: b
     def butlast(%Digit2{meter_object: meter_object, a: a}), do: Digit.new(meter_object, a)
 
-    def to_reverted_list(%Digit2{a: a, b: b}),
+    def to_recursive_reverted_list(%Digit2{a: a, b: b}),
       do: [maybe_reverted(b) || [b] | maybe_reverted(a) || [a]]
 
     def append(_, _), do: raise("You cannot append to Digit")
@@ -68,5 +68,7 @@ defmodule FingerTree.Digit2 do
         {Digit.new(meter_object, a), b, nil}
       end
     end
+
+    def to_list(%Digit2{a: a, b: b}), do: [a, b]
   end
 end

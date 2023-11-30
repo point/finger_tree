@@ -8,7 +8,7 @@ defmodule FingerTree.Impl do
 
   @spec deep(FingerTree.Digit.t(), FingerTree.t(), FingerTree.Digit.t()) :: DeepTree.t()
   def deep(pre, m, post) do
-    %{opfn: opfn} = meter_object = Measurable.meter(pre)
+    %{opfn: opfn} = meter_object = Measurable.meter(m)
 
     DeepTree.new(
       meter_object,
@@ -38,12 +38,15 @@ defmodule FingerTree.Impl do
 
   @spec maybe_reverted(FingerTree.t() | FingerTree.Digit.t() | term) :: [term()] | nil
   def maybe_reverted(o) do
-    Tree.impl_for(o) && Tree.to_reverted_list(o)
+    Tree.impl_for(o) && Tree.to_recursive_reverted_list(o)
   end
 
-  @spec to_list(FingerTree.t() | nil) :: [term()]
+  @spec to_recursive_reverted_list(FingerTree.t()) :: [term()]
+  def to_recursive_reverted_list(tree), do: Tree.to_recursive_reverted_list(tree) |> revert()
+
+  @spec to_list(FingerTree.t() | nil) :: [term()] | nil
   def to_list(nil), do: nil
-  def to_list(tree), do: Tree.to_reverted_list(tree) |> revert()
+  def to_list(tree), do: Tree.to_list(tree)
 
   @spec revert([] | [term()]) :: [term()]
   def revert(nested_list), do: revert(nested_list, [])
@@ -53,6 +56,7 @@ defmodule FingerTree.Impl do
 
   @spec to_tree(MeterObject.t(), [term] | nil) :: FingerTree.t()
   def to_tree(meter_object, nil), do: FingerTree.EmptyTree.new(meter_object)
+  def to_tree(meter_object, []), do: FingerTree.EmptyTree.new(meter_object)
 
   def to_tree(meter_object, xs) when is_list(xs),
     do: xs |> Enum.into(FingerTree.EmptyTree.new(meter_object))

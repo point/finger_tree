@@ -48,10 +48,15 @@ defmodule FingerTree.SingleTree do
     def rest(%SingleTree{meter_object: meter_object}), do: EmptyTree.new(meter_object)
     def last(%SingleTree{value: value}), do: value
     def butlast(%SingleTree{meter_object: meter_object}), do: EmptyTree.new(meter_object)
-    def to_reverted_list(%SingleTree{value: value}), do: maybe_reverted(value) || [value]
+
+    def to_recursive_reverted_list(%SingleTree{value: value}),
+      do: maybe_reverted(value) || [value]
+
     def append(%SingleTree{value: value}, other), do: Conjable.cons(other, value)
 
     def split(%SingleTree{meter_object: meter_object, value: value}, _, _),
       do: {EmptyTree.new(meter_object), value, EmptyTree.new(meter_object)}
+
+    def to_list(%SingleTree{value: value}), do: [value]
   end
 end

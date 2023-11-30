@@ -16,8 +16,8 @@ defmodule FingerTree do
     xs |> Enum.into(EmptyTree.new(meter_obj))
   end
 
-  @spec to_list(t()) :: [...]
-  def to_list(tree), do: FingerTree.Impl.to_list(tree)
+  @spec to_list(t()) :: [term()]
+  def to_list(tree), do: FingerTree.Impl.to_recursive_reverted_list(tree)
 
   @spec first(t()) :: term()
   def first(tree), do: Tree.first(tree)
@@ -36,6 +36,9 @@ defmodule FingerTree do
 
   @spec cons(t(), term()) :: t()
   def cons(tree, value), do: Conjable.cons(tree, value)
+
+  @spec conj(t(), term()) :: t()
+  def conj(tree, value), do: Conjable.conj(tree, value)
 
   @spec append(t(), t()) :: t()
   def append(tree, other), do: Tree.append(tree, other)

@@ -17,7 +17,7 @@ defmodule FingerTree.DeepTree do
   @type t() :: %DeepTree{
           meter_object: MeterObject.t(),
           pre: Digit.t(),
-          mid: SingleTree.t() | EmptyTree.t(),
+          mid: FingerTree.t(),
           post: Digit.t(),
           meterfn: (-> MeterObject.measure_result())
         }
@@ -25,7 +25,7 @@ defmodule FingerTree.DeepTree do
   @spec new(
           MeterObject.t(),
           Digit.t(),
-          EmptyTree.t() | SingleTree.t(),
+          FingerTree.t(),
           Digit.t(),
           (-> MeterObject.measure_result())
         ) :: t()
@@ -38,88 +38,43 @@ defmodule FingerTree.DeepTree do
       meterfn: meterfn
     }
 
-  @spec left(Digit.t(), EmptyTree.t() | SingleTree.t(), Digit.t()) :: t()
-  def left(%{a: _} = pre, mid, post) do
-    deep(pre, mid, post)
+  @spec right(Digit.t(), FingerTree.t(), Digit.t() | nil) :: FingerTree.t()
+  def right(%_{meter_object: meter_object} = pre, %EmptyTree{}, nil) do
+    to_tree(meter_object, to_list(pre))
   end
 
-  def left(
-        _pre,
-        %EmptyTree{},
-        %Digit1{a: a, meter_object: meter_object}
-      ) do
-    SingleTree.new(meter_object, a)
+  def right(pre, %SingleTree{value: value, meter_object: meter_object}, nil) do
+    deep(pre, EmptyTree.new(meter_object), value)
   end
 
-  @spec left(Digit.t() | nil, FingerTree.t(), Digit.t()) :: DeepTree.t()
-  def left(
-        _pre,
-        %EmptyTree{} = mid,
-        %Digit4{meter_object: meter_object} = post
-      ) do
-    f = Tree.first(post)
-    r = Tree.rest(post)
-    s = Tree.first(r)
-    deep(Digit.new(meter_object, f, s), mid, Tree.rest(r))
+  def right(pre, %DeepTree{pre: mid_pre, mid: mid_mid, post: %Digit1{a: a}}, nil) do
+    deep(pre, right(mid_pre, mid_mid, nil), a)
   end
 
-  def left(
-        _pre,
-        %EmptyTree{} = mid,
-        %_{meter_object: meter_object} = post
-      ) do
-    deep(Digit.new(meter_object, Tree.first(post)), mid, Tree.rest(post))
+  def right(pre, %DeepTree{pre: mid_pre, mid: mid_mid, post: mid_post}, nil) do
+    deep(pre, deep(mid_pre, mid_mid, Tree.butlast(mid_post)), Tree.last(mid_post))
   end
 
-  def left(
-        _pre,
-        mid,
-        post
-      ) do
-    # not packing first of mid into digit
-    deep(Tree.first(mid), Tree.rest(mid), post)
+  def right(pre, mid, post), do: deep(pre, mid, post)
+
+  def left(nil, %EmptyTree{}, %_{meter_object: meter_object} = post) do
+    to_tree(meter_object, to_list(post))
   end
 
-  @spec right(Digit.t(), EmptyTree.t() | SingleTree.t(), Digit.t()) :: t()
-  def right(pre, mid, %{a: _} = post) do
-    deep(pre, mid, post)
+  @spec right(Digit.t() | nil, FingerTree.t(), Digit.t()) :: FingerTree.t()
+  def left(nil, %SingleTree{meter_object: meter_object, value: value}, %_{} = post) do
+    deep(value, EmptyTree.new(meter_object), post)
   end
 
-  def right(
-        %Digit1{a: a, meter_object: meter_object},
-        %EmptyTree{},
-        _post
-      ) do
-    SingleTree.new(meter_object, a)
+  def left(nil, %DeepTree{pre: %Digit1{a: a}, mid: mid_mid, post: mid_post}, post) do
+    deep(a, left(nil, mid_mid, mid_post), post)
   end
 
-  def right(
-        %Digit4{meter_object: meter_object} = pre,
-        %EmptyTree{} = mid,
-        _post
-      ) do
-    f = Tree.first(pre)
-    r = Tree.rest(pre)
-    s = Tree.first(r)
-    deep(Digit.new(meter_object, f, s), mid, Tree.rest(r))
+  def left(nil, %DeepTree{pre: pre, mid: mid_mid, post: mid_post}, post) do
+    deep(Tree.first(pre), deep(Tree.rest(pre), mid_mid, mid_post), post)
   end
 
-  def right(
-        %_{meter_object: meter_object} = pre,
-        %EmptyTree{} = mid,
-        _post
-      ) do
-    deep(Digit.new(meter_object, Tree.first(pre)), mid, Tree.rest(pre))
-  end
-
-  def right(
-        pre,
-        mid,
-        _post
-      ) do
-    # not packing first of mid into digit
-    deep(pre, Tree.butlast(mid), Tree.last(mid))
-  end
+  def left(pre, mid, post), do: deep(pre, mid, post)
 
   @spec glue(FingerTree.t(), [term()], FingerTree.t()) :: FingerTree.t()
   def glue(%EmptyTree{}, xs, tree),
@@ -134,21 +89,18 @@ defmodule FingerTree.DeepTree do
   def glue(tree, xs, %Digit1{a: a}),
     do: (xs ++ [a]) |> List.foldl(tree, fn x, tree -> Conjable.conj(tree, x) end)
 
+  def glue(tree, xs, %SingleTree{value: a}),
+    do: (xs ++ [a]) |> List.foldl(tree, fn x, tree -> Conjable.conj(tree, x) end)
+
   def glue(
         %DeepTree{meter_object: meter_object1, pre: t1_pre, mid: t1_mid, post: t1_post},
         xs,
         %DeepTree{meter_object: meter_object2, pre: t2_pre, mid: t2_mid, post: t2_post}
       )
       when meter_object1 == meter_object2 do
-    xs =
-      [
-        Tree.to_reverted_list(t2_pre)
-        | [Enum.reverse(xs) | Tree.to_reverted_list(t1_post)]
-      ]
-      |> revert()
-      |> List.flatten()
+    xs2 = Tree.to_list(t1_post) ++ xs ++ Tree.to_list(t2_pre)
 
-    digits = DeepTree.to_digits(meter_object1, xs)
+    digits = DeepTree.to_digits(meter_object1, xs2)
 
     deep(
       t1_pre,
@@ -188,7 +140,7 @@ defmodule FingerTree.DeepTree do
 
     if predicate.(vpr) do
       {l, x, r} = Tree.split(pre, predicate, acc)
-      {to_tree(meter_object, l |> to_list()), x, left(r, mid, post)}
+      {to_tree(meter_object, to_list(l)), x, left(r, mid, post)}
     else
       vm = opfn.(vpr, Measurable.measured(mid))
 
@@ -250,10 +202,13 @@ defmodule FingerTree.DeepTree do
       DeepTree.glue(tree1, xs, tree2)
     end
 
-    def to_reverted_list(%DeepTree{pre: pre, mid: mid, post: post}),
+    def to_recursive_reverted_list(%DeepTree{pre: pre, mid: mid, post: post}),
       do: [
-        Tree.to_reverted_list(post) | [Tree.to_reverted_list(mid) | Tree.to_reverted_list(pre)]
+        Tree.to_recursive_reverted_list(post)
+        | [Tree.to_recursive_reverted_list(mid) | Tree.to_recursive_reverted_list(pre)]
       ]
+
+    def to_list(%DeepTree{pre: pre, mid: mid, post: post}), do: [pre, mid, post]
 
     def split(%DeepTree{} = tree, predicate, acc), do: DeepTree.split(tree, predicate, acc)
   end

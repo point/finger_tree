@@ -5,7 +5,6 @@ defmodule FingerTree.Digit1 do
   alias FingerTree.Protocols.Measurable
   alias FingerTree.Protocols.Conjable
   alias FingerTree.Digit
-  alias FingerTree.EmptyTree
   import FingerTree.Impl
 
   defstruct [:meter_object, :a, :cur_meter]
@@ -40,11 +39,12 @@ defmodule FingerTree.Digit1 do
 
   defimpl Tree do
     def first(%Digit1{a: a}), do: a
-    def rest(%Digit1{meter_object: meter_object}), do: EmptyTree.new(meter_object)
+    def rest(%Digit1{} = _), do: nil
     def last(%Digit1{a: a}), do: a
-    def butlast(%Digit1{meter_object: meter_object}), do: EmptyTree.new(meter_object)
-    def to_reverted_list(%Digit1{a: a}), do: maybe_reverted(a) || [a]
+    def butlast(%Digit1{} = _), do: nil
+    def to_recursive_reverted_list(%Digit1{a: a}), do: maybe_reverted(a) || [a]
     def append(_, _), do: raise("You cannot append to Digit")
     def split(%Digit1{a: a}, _, _), do: {nil, a, nil}
+    def to_list(%Digit1{a: a}), do: [a]
   end
 end

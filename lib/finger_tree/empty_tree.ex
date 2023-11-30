@@ -54,8 +54,9 @@ defmodule FingerTree.EmptyTree do
     def rest(_), do: nil
     def last(_), do: nil
     def butlast(_), do: nil
-    def to_reverted_list(_), do: []
+    def to_recursive_reverted_list(_), do: []
     def append(_, other), do: other
     def split(_, _, _), do: raise("You cannot split EmptyTree")
+    def to_list(_), do: []
   end
 end
