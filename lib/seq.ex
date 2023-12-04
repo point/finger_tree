@@ -40,6 +40,7 @@ defmodule FingerTree.Seq do
     {%Seq{ft: l}, v, %Seq{ft: r}}
   end
 
+  @spec take(t(), integer()) :: t()
   def take(_, 0), do: %Seq{ft: EmptyTree.new(meter_object())}
 
   def take(%Seq{ft: tree} = seq, n) when n < 0 do
@@ -56,6 +57,7 @@ defmodule FingerTree.Seq do
     %Seq{ft: FingerTree.conj(l, v)}
   end
 
+  @spec drop(t(), integer()) :: t()
   def drop(%Seq{} = seq, 0), do: seq
 
   def drop(%Seq{ft: tree} = seq, n) when n < 0 do
@@ -70,14 +72,19 @@ defmodule FingerTree.Seq do
     %Seq{ft: r}
   end
 
+  @spec count(t()) :: non_neg_integer()
   def count(%Seq{ft: tree}), do: FingerTree.measure(tree)
 
+  @spec at(t(), non_neg_integer()) :: term()
   def at(%Seq{} = seq, n, notfound \\ nil) when n >= 0 do
     cond do
       n > Seq.count(seq) - 1 -> notfound
       :otherwise -> drop(seq, n) |> first()
     end
   end
+
+  @spec empty?(t()) :: boolean()
+  def empty?(%Seq{ft: tree}), do: FingerTree.empty?(tree)
 
   defimpl Collectable do
     def into(%Seq{} = seq) do

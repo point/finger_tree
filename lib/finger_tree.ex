@@ -46,4 +46,8 @@ defmodule FingerTree do
   @spec split(SingleTree.t() | DeepTree.t(), (MeterObject.measure_result() -> boolean())) ::
           {t(), term(), t()}
   def split(%{meter_object: %{id: id}} = tree, predicate), do: Tree.split(tree, predicate, id)
+
+  @spec empty?(t()) :: boolean()
+  def empty?(%EmptyTree{} = _), do: true
+  def empty?(_), do: false
 end
