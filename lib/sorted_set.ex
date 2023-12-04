@@ -23,8 +23,13 @@ defmodule FingerTree.SortedSet do
             :otherwise -> :gt
           end
         end
-      ) do
-    %SortedSet{ft: FingerTree.finger_tree(meter_object(), xs), comparator: comparator}
+      )
+
+  def new(%Range{} = r, comparator), do: new(Enum.to_list(r), comparator)
+
+  def new(xs, comparator) when is_list(xs) do
+    xs
+    |> Enum.into(%SortedSet{ft: FingerTree.finger_tree(meter_object()), comparator: comparator})
   end
 
   @spec to_list(t()) :: [term()]

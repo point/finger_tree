@@ -9,7 +9,8 @@ defmodule FingerTree.Seq do
   @type t() :: %Seq{ft: FingerTree.t()}
 
   def new(), do: %Seq{ft: FingerTree.finger_tree(meter_object())}
-  def new(xs), do: %Seq{ft: FingerTree.finger_tree(meter_object(), xs)}
+  def new(%Range{} = r), do: r |> Enum.to_list() |> new()
+  def new(xs) when is_list(xs), do: %Seq{ft: FingerTree.finger_tree(meter_object(), xs)}
   def to_list(%Seq{ft: tree}), do: FingerTree.to_list(tree)
 
   @spec first(t()) :: term()

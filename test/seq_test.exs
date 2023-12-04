@@ -8,6 +8,8 @@ defmodule SeqTest do
 
     assert [1, 2, 3, 4] = seq |> Seq.to_list()
 
+    assert [1, 2, 3, 4] = Seq.new(1..4) |> Seq.to_list()
+
     assert 1 == Seq.first(seq)
     assert [2, 3, 4] = seq |> Seq.rest() |> Seq.to_list()
 
