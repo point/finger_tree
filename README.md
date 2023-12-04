@@ -19,7 +19,7 @@ It provides logarithmic time concatenation and random access.
 Finger trees combine several features that make them pretty versatile:
 * Purity. This is purely functional data structure
 * Flexibility. Finger tree can hold any Elixir data structure. But also, you can build your own abstractions with described amortized complexity 
-  based on finger tree. See [Seq]() and [SortedSet]()
+  based on finger tree. See [Seq](https://github.com/point/finger_tree#finger-tree--based-sequence) and [SortedSet](https://github.com/point/finger_tree#finger-tree--based-sorted-set)
 * Efficiency. Finger trees have efficient random-access and tree (sequence) split complexity. Also, O(1) count measurement.
 
 The best graphical representation of Finger Trees presented is in the paper:
