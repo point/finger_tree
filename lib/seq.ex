@@ -87,6 +87,27 @@ defmodule FingerTree.Seq do
   @spec empty?(t()) :: boolean()
   def empty?(%Seq{ft: tree}), do: FingerTree.empty?(tree)
 
+  @spec insert_at(t(), integer(), term()) :: t()
+  def insert_at(%Seq{ft: tree} = seq, index, value) when index < 0 do
+    index = count(seq) + index
+
+    if index < 0 do
+      Seq.cons(seq, value)
+    else
+      {l, v, r} = FingerTree.split(tree, fn pos -> pos > index end)
+      %Seq{ft: FingerTree.conj(l, v) |> FingerTree.conj(value) |> FingerTree.append(r)}
+    end
+  end
+
+  def insert_at(%Seq{ft: tree} = seq, index, value) do
+    if index > Seq.count(seq) - 1 do
+      Seq.conj(seq, value)
+    else
+      {l, v, r} = FingerTree.split(tree, fn pos -> pos > index end)
+      %Seq{ft: FingerTree.conj(l, value) |> FingerTree.conj(v) |> FingerTree.append(r)}
+    end
+  end
+
   defimpl Collectable do
     def into(%Seq{} = seq) do
       collector_fun = fn

@@ -43,6 +43,15 @@ defmodule SeqTest do
     assert 1 == Seq.at(seq, 0)
     assert 4 == Seq.at(seq, 3)
     assert :notfound == Seq.at(seq, 4, :notfound)
+
+    assert [0, 1, 2, 3, 4] == Seq.new(1..4) |> Seq.insert_at(0, 0) |> Seq.to_list()
+    assert [1, 2, 0, 3, 4] == Seq.new(1..4) |> Seq.insert_at(2, 0) |> Seq.to_list()
+    assert [1, 2, 3, 0, 4] == Seq.new(1..4) |> Seq.insert_at(3, 0) |> Seq.to_list()
+    assert [1, 2, 3, 4, 0] == Seq.new(1..4) |> Seq.insert_at(4, 0) |> Seq.to_list()
+    assert [1, 2, 3, 0] == Seq.new(1..3) |> Seq.insert_at(10, 0) |> Seq.to_list()
+    assert [1, 2, 3, 0] == Seq.new(1..3) |> Seq.insert_at(-1, 0) |> Seq.to_list()
+    assert [1, 2, 0, 3] == Seq.new(1..3) |> Seq.insert_at(-2, 0) |> Seq.to_list()
+    assert [0, 1, 2, 3] == Seq.new(1..3) |> Seq.insert_at(-10, 0) |> Seq.to_list()
   end
 
   test "seq enumerable interface" do
