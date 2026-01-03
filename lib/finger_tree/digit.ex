@@ -8,7 +8,7 @@ defmodule FingerTree.Digit do
   @type t() :: Digit1.t() | Digit2.t() | Digit3.t() | Digit4.t()
 
   def new(%MeterObject{} = meter_object, values) when is_list(values),
-    do: apply(__MODULE__, :digit, [meter_object | Enum.filter(values, &Function.identity/1)])
+    do: apply(__MODULE__, :new, [meter_object | Enum.filter(values, &Function.identity/1)])
 
   def new(%MeterObject{} = meter_object, a), do: Digit1.new(meter_object, a)
   def new(%MeterObject{} = meter_object, a, b), do: Digit2.new(meter_object, a, b)

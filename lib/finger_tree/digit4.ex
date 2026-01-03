@@ -20,6 +20,8 @@ defmodule FingerTree.Digit4 do
 
   @spec new(MeterObject.t(), term(), term(), term(), term()) :: t()
   def new(%MeterObject{opfn: opfn, measurefn: measurefn} = meter_object, a, b, c, d) do
+    [a, b, c, d] = Enum.sort([a, b, c, d], meter_object.partial_sorterfn)
+
     %Digit4{
       meter_object: meter_object,
       a: a,

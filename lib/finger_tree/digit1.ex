@@ -30,11 +30,17 @@ defmodule FingerTree.Digit1 do
   end
 
   defimpl Conjable do
-    def conj(%Digit1{meter_object: meter_object, a: a}, value),
-      do: Digit.new(meter_object, a, value)
+    def conj(%Digit1{meter_object: meter_object, a: a}, value) do
+      [a, value]
+      |> Enum.sort(meter_object.partial_sorterfn)
+      |> then(fn values -> Digit.new(meter_object, values) end)
+    end
 
-    def cons(%Digit1{meter_object: meter_object, a: a}, value),
-      do: Digit.new(meter_object, value, a)
+    def cons(%Digit1{meter_object: meter_object, a: a}, value) do
+      [value, a]
+      |> Enum.sort(meter_object.partial_sorterfn)
+      |> then(fn values -> Digit.new(meter_object, values) end)
+    end
   end
 
   defimpl Tree do
