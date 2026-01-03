@@ -222,5 +222,8 @@ defmodule FingerTreeTest do
     assert {ft1, 1024, ft2} = FingerTree.split(ft, fn m -> m >= 1024 end)
     assert FingerTree.to_list(ft1) == l1
     assert FingerTree.to_list(ft2) == l2
+
+    ft = FingerTree.finger_tree(meter_object, [1, 2, 3])
+    {_, 3, %EmptyTree{}} = FingerTree.split(ft, fn m -> m == 10 end)
   end
 end
