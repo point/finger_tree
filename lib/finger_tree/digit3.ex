@@ -19,7 +19,11 @@ defmodule FingerTree.Digit3 do
 
   @spec new(MeterObject.t(), term(), term(), term()) :: t()
   def new(%MeterObject{opfn: opfn, measurefn: measurefn} = meter_object, a, b, c) do
-    [a, b, c] = Enum.sort([a, b, c], meter_object.partial_sorterfn)
+    [a, b, c] =
+      if match?(%_{meter_object: _}, a) || match?(%_{meter_object: _}, b) ||
+           match?(%_{meter_object: _}, c),
+         do: [a, b, c],
+         else: Enum.sort([a, b, c], meter_object.partial_sorterfn)
 
     %Digit3{
       meter_object: meter_object,
@@ -43,11 +47,17 @@ defmodule FingerTree.Digit3 do
   end
 
   defimpl Conjable do
+    def conj(%Digit3{meter_object: meter_object, a: a, b: b, c: c}, %_{meter_object: _} = value),
+      do: Digit.new(meter_object, a, b, c, value)
+
     def conj(%Digit3{meter_object: meter_object, a: a, b: b, c: c}, value) do
       [a, b, c, value]
       |> Enum.sort(meter_object.partial_sorterfn)
       |> then(fn values -> Digit.new(meter_object, values) end)
     end
+
+    def cons(%Digit3{meter_object: meter_object, a: a, b: b, c: c}, %_{meter_object: _} = value),
+      do: Digit.new(meter_object, value, a, b, c)
 
     def cons(%Digit3{meter_object: meter_object, a: a, b: b, c: c}, value) do
       [value, a, b, c]
