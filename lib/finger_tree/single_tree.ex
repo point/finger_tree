@@ -9,13 +9,22 @@ defmodule FingerTree.SingleTree do
 
   import FingerTree.Impl
 
-  defstruct [:meter_object, :value]
+  defstruct [:meter_object, :value, :cur_meter]
 
-  @type t() :: %SingleTree{meter_object: MeterObject.t(), value: term()}
+  @type t() :: %SingleTree{
+          meter_object: MeterObject.t(),
+          value: term(),
+          cur_meter: MeterObject.measure_result()
+        }
 
   @spec new(MeterObject.t(), term()) :: t()
-  def new(%MeterObject{} = meter_object, value),
-    do: %SingleTree{meter_object: meter_object, value: value}
+  def new(%MeterObject{opfn: opfn, measurefn: measurefn} = meter_object, value) do
+    %SingleTree{
+      meter_object: meter_object,
+      value: value,
+      cur_meter: if(opfn, do: maybe_measure(value) || measurefn.(value))
+    }
+  end
 
   defimpl Conjable do
     def conj(%SingleTree{meter_object: meter_object, value: tree_value}, value) do
@@ -38,9 +47,7 @@ defmodule FingerTree.SingleTree do
 
   defimpl Measurable do
     def meter(%SingleTree{meter_object: meter_object}), do: meter_object
-
-    def measured(%SingleTree{meter_object: %{measurefn: measurefn}, value: value}),
-      do: maybe_measure(value) || measurefn.(value)
+    def measured(%SingleTree{cur_meter: cur_meter}), do: cur_meter
   end
 
   defimpl Tree do

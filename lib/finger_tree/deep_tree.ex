@@ -12,14 +12,14 @@ defmodule FingerTree.DeepTree do
 
   import FingerTree.Impl
 
-  defstruct [:meter_object, :pre, :mid, :post, :meterfn]
+  defstruct [:meter_object, :pre, :mid, :post, :cur_meter]
 
   @type t() :: %DeepTree{
           meter_object: MeterObject.t(),
           pre: Digit.t(),
           mid: FingerTree.t(),
           post: Digit.t(),
-          meterfn: (-> MeterObject.measure_result())
+          cur_meter: MeterObject.measure_result()
         }
 
   @spec new(
@@ -27,15 +27,15 @@ defmodule FingerTree.DeepTree do
           Digit.t(),
           FingerTree.t(),
           Digit.t(),
-          (-> MeterObject.measure_result())
+          MeterObject.measure_result()
         ) :: t()
-  def new(%MeterObject{} = meter_object, pre, mid, post, meterfn),
+  def new(%MeterObject{} = meter_object, pre, mid, post, cur_meter),
     do: %DeepTree{
       meter_object: meter_object,
       pre: pre,
       mid: mid,
       post: post,
-      meterfn: meterfn
+      cur_meter: cur_meter
     }
 
   @spec right(Digit.t(), FingerTree.t(), Digit.t() | nil) :: FingerTree.t()
@@ -181,7 +181,7 @@ defmodule FingerTree.DeepTree do
 
   defimpl Measurable do
     def meter(%DeepTree{meter_object: meter_object}), do: meter_object
-    def measured(%DeepTree{meterfn: meterfn}), do: meterfn.()
+    def measured(%DeepTree{cur_meter: cur_meter}), do: cur_meter
   end
 
   defimpl Tree do

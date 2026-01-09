@@ -77,10 +77,14 @@ defmodule FingerTree.Seq do
   def count(%Seq{ft: tree}), do: FingerTree.measure(tree)
 
   @spec at(t(), non_neg_integer()) :: term()
-  def at(%Seq{} = seq, n, notfound \\ nil) when n >= 0 do
+  def at(%Seq{ft: tree} = seq, n, notfound \\ nil) when n >= 0 do
     cond do
-      n > Seq.count(seq) - 1 -> notfound
-      :otherwise -> drop(seq, n) |> first()
+      n > Seq.count(seq) - 1 ->
+        notfound
+
+      :otherwise ->
+        {_, value, _} = FingerTree.split(tree, fn pos -> pos > n end)
+        value
     end
   end
 
@@ -95,7 +99,7 @@ defmodule FingerTree.Seq do
       Seq.cons(seq, value)
     else
       {l, v, r} = FingerTree.split(tree, fn pos -> pos > index end)
-      %Seq{ft: FingerTree.conj(l, v) |> FingerTree.conj(value) |> FingerTree.append(r)}
+      %Seq{ft: FingerTree.append(FingerTree.conj(l, v), FingerTree.cons(r, value))}
     end
   end
 
@@ -104,7 +108,7 @@ defmodule FingerTree.Seq do
       Seq.conj(seq, value)
     else
       {l, v, r} = FingerTree.split(tree, fn pos -> pos > index end)
-      %Seq{ft: FingerTree.conj(l, value) |> FingerTree.conj(v) |> FingerTree.append(r)}
+      %Seq{ft: FingerTree.append(FingerTree.conj(l, value), FingerTree.cons(r, v))}
     end
   end
 

@@ -8,14 +8,14 @@ defmodule FingerTree.Impl do
 
   @spec deep(FingerTree.Digit.t(), FingerTree.t(), FingerTree.Digit.t()) :: DeepTree.t()
   def deep(pre, m, post) do
-    %{opfn: opfn} = meter_object = Measurable.meter(m)
+    meter_object = Measurable.meter(m)
 
     DeepTree.new(
       meter_object,
       pre,
       m,
       post,
-      if(opfn, do: fn -> measured3(meter_object, pre, m, post) end)
+      measured3(meter_object, pre, m, post)
     )
   end
 

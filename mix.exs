@@ -7,7 +7,8 @@ defmodule FingerTree.MixProject do
       version: "0.1.0",
       elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      aliases: aliases()
     ]
   end
 
@@ -18,10 +19,17 @@ defmodule FingerTree.MixProject do
     ]
   end
 
+  defp aliases do
+    [
+      test: ["test --exclude benchmark"]
+    ]
+  end
+
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
+      {:benchee, "~> 1.3", only: :test}
     ]
   end
 end
