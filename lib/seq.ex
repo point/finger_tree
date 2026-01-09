@@ -159,11 +159,12 @@ defmodule FingerTree.Seq do
 
     def slice(seq) do
       {:ok, Seq.count(seq),
-       fn start, len ->
+       fn start, len, step ->
          seq
          |> Seq.drop(start)
-         |> Seq.take(len)
+         |> Seq.take(len * step)
          |> Seq.to_list()
+         |> Enum.take_every(step)
        end}
     end
   end
