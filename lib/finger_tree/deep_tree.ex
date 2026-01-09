@@ -57,11 +57,11 @@ defmodule FingerTree.DeepTree do
 
   def right(pre, mid, post), do: deep(pre, mid, post)
 
+  @spec left(Digit.t() | nil, FingerTree.t(), Digit.t()) :: FingerTree.t()
   def left(nil, %EmptyTree{}, %_{meter_object: meter_object} = post) do
     to_tree(meter_object, to_list(post))
   end
 
-  @spec left(Digit.t() | nil, FingerTree.t(), Digit.t()) :: FingerTree.t()
   def left(nil, %SingleTree{meter_object: meter_object, value: value}, %_{} = post) do
     deep(value, EmptyTree.new(meter_object), post)
   end
